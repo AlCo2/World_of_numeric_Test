@@ -1,9 +1,9 @@
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 import time
+from datetime import datetime
 import csv
 import sys
-
 
 def insertData():
     database = mongo[database_name]
@@ -12,12 +12,19 @@ def insertData():
     time.sleep(1)
     products = []
     for row in file:
+        row['ProductID'] = int(row['ProductID'])
+        row['Price'] = float(row['Price'])
         products.append(row)
     products_collection = database["products"]
     products_collection.insert_many(products)
     print("inserting sales...\n")
     sales = []
     for row in file2:
+        row['SaleID'] = int(row['SaleID'])
+        row['ProductID'] = int(row['ProductID'])
+        row['Quantity'] = int(row['Quantity'])
+        row['Date'] = datetime.strptime(row['Date'], '%Y-%m-%d')
+        row['TotalAmount'] = float(row['TotalAmount'])
         sales.append(row)
     sales_collections = database["sales"]
     sales_collections.insert_many(sales)
