@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import mongoose from "mongoose";
 import dotenv from 'dotenv';
+import { Product } from "./models/Product";
 
 dotenv.config();
 
@@ -14,8 +15,9 @@ mongoose.connect(dbUrl).then(()=>
   console.log(error);
 });
 
-app.get('/', (req:Request, res:Response) => { 
-  res.send('everything is working well!');
+app.get('/', async (req:Request, res:Response) => {
+  const products = await Product.find();
+  res.json(products);
 })
 
 app.listen(port, () => {
