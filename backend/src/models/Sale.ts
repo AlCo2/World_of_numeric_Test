@@ -1,8 +1,14 @@
-import mongoose from "mongoose";
+import {Schema, model} from "mongoose";
 
-const { Schema } = mongoose;
+interface ISale {
+    SaleId: number,
+    ProductID: number,
+    Quantity: number,
+    Date: Date,
+    TotalAmount: number
+}
 
-const saleSchema = new Schema({
+const saleSchema = new Schema<ISale>({
     SaleId: Number,
     ProductID: Number,
     Quantity: Number,
@@ -10,4 +16,4 @@ const saleSchema = new Schema({
     TotalAmount: Number
 })
 
-export const Sale = mongoose.model('Sale', saleSchema);
+export const Sale = model<ISale>('Sale', saleSchema);
