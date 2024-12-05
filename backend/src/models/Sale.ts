@@ -15,5 +15,7 @@ const saleSchema = new Schema<ISale>({
     Date: Date,
     TotalAmount: Number
 })
-
+saleSchema.index({ProductID: 1});
+saleSchema.index({Date: 1})
+// saleSchema.indexes()
 export const Sale = model<ISale>('Sale', saleSchema);
