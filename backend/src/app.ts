@@ -68,6 +68,22 @@ app.get('/products', async (req:Request, res:Response)=>{
   res.status(200).json(products);
 })
 
+app.get('/analytics/total_sales', async (req:Request, res:Response)=>{
+  const date_start = new Date(req.query.date_start as string);
+  const date_end = new Date(req.query.date_end as string);
+  if (!date_start || !date_end)
+    res.status(404).json({message: 'There is no data to show'});
+  const sales = await Sale.find({Date: {
+    $gte: date_start,
+    $lte: date_end
+  }})
+  res.status(200).json(sales);
+})
+
+app.get('/analytics/trending_products', async (req:Request, res:Response)=> {
+  res.status(200).json("sucsss");
+})
+
 app.listen(port, () => {
   console.log(`app listening on port ${port}`);
 })
