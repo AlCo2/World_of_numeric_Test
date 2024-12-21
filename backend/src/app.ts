@@ -10,6 +10,16 @@ const dbUrl = process.env.dbUrl || '';
 const app: Express = express();
 const port = 3000;
 
+app.use(function (req, res, next) {
+  const url = process.env.frontUrl || ''
+  res.setHeader('Access-Control-Allow-Origin', url);
+
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  next();
+});
+
 const productsLookup = {
   from: 'sales',
   localField: 'ProductID',
@@ -37,37 +47,11 @@ const productsProject = {
   QuantitySold: true,
 }
 
-const categoriesLookup = {
-  from: 'sales',
-  localField: 'ProductID',
-  foreignField: 'ProductID',
-  pipeline: [
-    { 
-      $project: {
-        _id: false,
-        Quantity: true
-      } 
-    }
-  ],
-  as: 'Sales',
-}
-const categoriesGroup = {
-  _id:'$Category',
-  QuantitySold: { $sum: "$Sales.Quantity" }
-}
-
-const categoriesProject = {
-  _id: false,
-  Category: true,
-  QuantitySold: true,
-}
-
 mongoose.connect(dbUrl).then(()=>
   console.log("connected to database")
 ).catch((error)=>{
   console.log(error);
 });
-
 
 app.get('/products', async (req:Request, res:Response)=>{
   const products = await Product.aggregate([
@@ -83,8 +67,9 @@ app.get('/products', async (req:Request, res:Response)=>{
   ]);
   res.status(200).json(products);
 })
+
 app.get('/analytics/total_sales', async (req:Request, res:Response)=>{
-  try{
+try{
   const date_start = new Date(req.query.date_start as string);
   const date_end = new Date(req.query.date_end as string);
   const sales = await Sale.find({Date: {
@@ -94,8 +79,7 @@ app.get('/analytics/total_sales', async (req:Request, res:Response)=>{
   res.status(200).json(sales);
 }catch(e){
   res.status(404).json({message: 'There is no data to show'});
-}
-})
+}})
 
 app.get('/analytics/trending_products', async (req:Request, res:Response)=> {
   const products = await Product.aggregate([
@@ -112,7 +96,7 @@ app.get('/analytics/trending_products', async (req:Request, res:Response)=> {
       $sort: { "QuantitySold": -1 }
     },
     {
-      $limit: 3,
+      $limit: 5,
     }
   ]);
   res.status(200).json(products);
